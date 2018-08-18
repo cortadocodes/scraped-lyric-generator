@@ -4,10 +4,6 @@ from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 
 
-URL = "https://www.azlyrics.com/m/mychemicalromance.html"
-SEARCH_STRING = 'mychemicalromance'
-
-
 def get_relevant_pages(url, search_string):
     base_url = get_base_url(url)
     soup = get_soup(url)
@@ -50,6 +46,3 @@ def get_relevant_links(soup, search_string, base_url):
 def get_page_name(link):
     page_name = link.split('/')[-1].split('.')[0]
     return page_name
-
-
-song_links = get_relevant_pages(URL, SEARCH_STRING)
