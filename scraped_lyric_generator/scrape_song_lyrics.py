@@ -45,6 +45,11 @@ def get_page_name(link):
     return page_name
 
 
-base_url = get_base_url(URL)
-soup = get_soup(URL)
-song_links = get_relevant_links(soup, SEARCH_STRING, base_url)
+def get_links_to_relevant_pages(url, search_string):
+    base_url = get_base_url(url)
+    soup = get_soup(url)
+    relevant_links = get_relevant_links(soup, search_string, base_url)
+    return relevant_links
+
+
+song_links = get_links_to_relevant_pages(URL, SEARCH_STRING)
