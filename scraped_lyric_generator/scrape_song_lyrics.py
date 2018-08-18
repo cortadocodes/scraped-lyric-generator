@@ -8,6 +8,13 @@ URL = "https://www.azlyrics.com/m/mychemicalromance.html"
 SEARCH_STRING = 'mychemicalromance'
 
 
+def get_relevant_pages(url, search_string):
+    base_url = get_base_url(url)
+    soup = get_soup(url)
+    relevant_pages = get_relevant_links(soup, search_string, base_url)
+    return relevant_pages
+
+
 def get_base_url(url):
     separator = '://'
     parsed_url = urlparse(url)
@@ -45,11 +52,4 @@ def get_page_name(link):
     return page_name
 
 
-def get_links_to_relevant_pages(url, search_string):
-    base_url = get_base_url(url)
-    soup = get_soup(url)
-    relevant_links = get_relevant_links(soup, search_string, base_url)
-    return relevant_links
-
-
-song_links = get_links_to_relevant_pages(URL, SEARCH_STRING)
+song_links = get_relevant_pages(URL, SEARCH_STRING)
