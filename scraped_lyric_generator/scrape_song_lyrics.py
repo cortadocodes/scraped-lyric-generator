@@ -26,17 +26,23 @@ def get_soup(url):
 def get_relevant_links(soup, search_string, base_url):
     # Get all links
     link_objects = soup.find_all('a')
-    relevant_links = []
+    relevant_links = {}
 
     # Store links containing the search_string
     for link_object in link_objects:
         link = link_object.get('href')
         if link is not None:
             if search_string in link:
+                page_name = get_page_name(link)
                 full_link = urljoin(base_url, link)
-                relevant_links.append(full_link)
+                relevant_links[page_name] = full_link
 
     return relevant_links
+
+
+def get_page_name(link):
+    page_name = link.split('/')[-1].split('.')[0]
+    return page_name
 
 
 base_url = get_base_url(URL)
