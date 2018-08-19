@@ -42,7 +42,7 @@ def get_base_url(url):
     return base_url
 
 
-def get_soup(url, cache_file, add_to_cache=True):
+def get_soup(url, cache_file, refresh_cache=False):
     """
     Scrape the url and return its contents as a BeautifulSoup object. If
     the url has already been scraped and is cached, return the contents
@@ -50,7 +50,8 @@ def get_soup(url, cache_file, add_to_cache=True):
 
     :param str url: the webpage to be scraped
     :param str cache_file: path to the cache file
-    :param bool add_to_cache: if true, save the contents in the cache
+    :param bool refresh_cache: if true, scrape url again, even if its
+        contents are in the cache
 
     :return bs4.BeautifulSoup: the HTML contents of the webpage in an
         easily crawlable form
@@ -64,10 +65,22 @@ def get_soup(url, cache_file, add_to_cache=True):
         cache = {}
 
     # Load the scraped content from the cache if it exists there
-    if url in cache.keys():
+    if (url in cache.keys() and not refresh_cache):
         content = cache[url]
 
-    # Otherwise, get the soup from the server
+        if content is None:
+            try:
+                response = requests.get(url, timeout=5)
+                content = response.text
+
+            except requests.exceptions.ConnectionError:
+                content = None
+                print('Connection error for url {} (server may have blocked scraper)'.format(url))
+
+            if content is not None:
+                cache[url] = content
+
+    # Otherwise, scrape the webpage
     else:
         try:
             response = requests.get(url, timeout=5)
@@ -77,7 +90,7 @@ def get_soup(url, cache_file, add_to_cache=True):
             content = None
             print('Connection error for url {} (server may have blocked scraper)'.format(url))
 
-        if add_to_cache and cache.get(url) is not None:
+        if content is not None:
             cache[url] = content
 
     # Save the cache
