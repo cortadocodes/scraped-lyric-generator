@@ -8,7 +8,7 @@ class Cacher:
         self.cache = cache
         self.refresh_cache = refresh_cache
 
-    def initialise_cache(self):
+    def initialise(self):
         if os.path.exists(self.path):
             with open(self.path, 'rb') as f:
                 try:
@@ -24,6 +24,6 @@ class Cacher:
     def get_item(self, identifier):
         return self.cache[identifier]
 
-    def save_cache(self):
+    def save(self):
         with open(self.path, 'wb') as f:
             pickle.dump(self.cache, f)
