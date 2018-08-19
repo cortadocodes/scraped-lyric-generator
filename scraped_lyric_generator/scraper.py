@@ -68,28 +68,15 @@ def get_soup(url, cache_file, refresh_cache=False):
     if (url in cache.keys() and not refresh_cache):
         content = cache[url]
 
+        # If the cache contains no content for the URL, then scrape anyway
         if content is None:
-            try:
-                response = requests.get(url, timeout=5)
-                content = response.text
-
-            except requests.exceptions.ConnectionError:
-                content = None
-                print('Connection error for url {} (server may have blocked scraper)'.format(url))
-
+            content = try_scraping(url, timeout=5)
             if content is not None:
                 cache[url] = content
 
-    # Otherwise, scrape the webpage
+    # If the URL doesn't exis in the cache, scrape the webpage
     else:
-        try:
-            response = requests.get(url, timeout=5)
-            content = response.text
-
-        except requests.exceptions.ConnectionError:
-            content = None
-            print('Connection error for url {} (server may have blocked scraper)'.format(url))
-
+        content = try_scraping(url, timeout=5)
         if content is not None:
             cache[url] = content
 
@@ -101,6 +88,17 @@ def get_soup(url, cache_file, refresh_cache=False):
     if content is not None:
         soup = BeautifulSoup(content, 'html.parser')
         return soup
+
+
+def try_scraping(url, timeout):
+    try:
+        response = requests.get(url, timeout=timeout)
+        content = response.text
+        return content
+
+    except requests.exceptions.ConnectionError:
+        message = 'Connection error for url {} (server may have blocked scraper)'
+        print(message.format(url))
 
 
 def get_relevant_links(soup, search_string, base_url):
