@@ -60,7 +60,10 @@ def get_soup(url, cache_file, refresh_cache=False):
     # Load cache if it exists
     if os.path.exists(cache_file):
         with open(cache_file, 'rb') as f:
-            cache = pickle.load(f)
+            try:
+                cache = pickle.load(f)
+            except EOFError:
+                cache = {}
     else:
         cache = {}
 
