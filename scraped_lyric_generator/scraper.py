@@ -68,7 +68,7 @@ def get_soup(url, cache_file, refresh_cache=False):
         cache = {}
 
     # Load the scraped content from the cache if it exists there
-    if (url in cache.keys() and not refresh_cache):
+    if url in cache.keys() and not refresh_cache:
         content = cache[url]
 
         # If the cache contains no content for the URL, then scrape anyway
@@ -77,7 +77,7 @@ def get_soup(url, cache_file, refresh_cache=False):
             if content is not None:
                 cache[url] = content
 
-    # If the URL doesn't exis in the cache, scrape the webpage
+    # If the URL doesn't exist in the cache, scrape the webpage
     else:
         content = try_scraping(url, timeout=5)
         if content is not None:
