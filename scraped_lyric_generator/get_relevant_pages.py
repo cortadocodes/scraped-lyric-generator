@@ -1,12 +1,14 @@
+import os
+import pickle
 import requests
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
 
-def get_relevant_pages(url, search_string):
+def get_relevant_pages(url, search_string, cache_file):
     base_url = get_base_url(url)
-    soup = get_soup(url)
+    soup = get_soup(url, cache_file)
     relevant_pages = get_relevant_links(soup, search_string, base_url)
     return relevant_pages
 
@@ -18,10 +20,31 @@ def get_base_url(url):
     return base_url
 
 
-def get_soup(url):
-    # Get soup (content) from URL
-    response = requests.get(url, timeout=5)
-    content = response.text
+def get_soup(url, cache_file, add_to_cache=True):
+    # Load cache if it exists
+    if os.path.exists(cache_file):
+        with open(cache_file, 'rb') as f:
+            cache = pickle.load(f)
+    else:
+        cache = {}
+
+    # Load the scraped content from the cache if it exists there
+    if url in cache.keys():
+        content = cache[url]
+
+    # Otherwise, get the soup from the server
+    else:
+        response = requests.get(url, timeout=5)
+        content = response.text
+
+        if add_to_cache:
+            cache[url] = content
+
+    # Save the cache
+    with open(cache_file, 'wb') as f:
+        pickle.dump(cache, f)
+
+    # Create the soup object
     soup = BeautifulSoup(content, 'html.parser')
     return soup
 
