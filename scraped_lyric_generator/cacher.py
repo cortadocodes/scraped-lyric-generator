@@ -7,6 +7,7 @@ class Cacher:
         self.path = path
         self.cache = cache
         self.refresh_cache = refresh_cache
+        self.initialise()
 
     def initialise(self):
         if os.path.exists(self.path):
