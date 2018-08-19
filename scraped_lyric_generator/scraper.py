@@ -1,12 +1,10 @@
-import os
-import pickle
 import requests
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
 
-def get_relevant_pages(url, search_string, cache_file):
+def get_relevant_pages(url, search_string, cache):
     """
     Given the url for a page, get a dictionary of child page names and
     their links if they contain the search_string. Keep a cache in
@@ -15,13 +13,13 @@ def get_relevant_pages(url, search_string, cache_file):
 
     :param str url: URL of the main page
     :param str search_string: string to look for in each link
-    :param str cache_file: path to the cache file
+    :param cacher.Cacher cache: Cacher object
 
     :return dict: the page names and their links
     """
 
     base_url = get_base_url(url)
-    soup = get_soup(url, cache_file)
+    soup = get_soup(url, cache)
     relevant_pages = get_relevant_links(soup, search_string, base_url)
     return relevant_pages
 
@@ -42,14 +40,14 @@ def get_base_url(url):
     return base_url
 
 
-def get_soup(url, cache_file, refresh_cache=False):
+def get_soup(url, cache, refresh_cache=False):
     """
     Scrape the url and return its contents as a BeautifulSoup object. If
     the url has already been scraped and is cached, return the contents
     of the cache instead.
 
     :param str url: the webpage to be scraped
-    :param str cache_file: path to the cache file
+    :param cacher.Cacher cache: Cacher object
     :param bool refresh_cache: if true, scrape url again, even if its
         contents are in the cache
 
@@ -57,35 +55,23 @@ def get_soup(url, cache_file, refresh_cache=False):
         easily crawlable form
     """
 
-    # Load cache if it exists
-    if os.path.exists(cache_file):
-        with open(cache_file, 'rb') as f:
-            try:
-                cache = pickle.load(f)
-            except EOFError:
-                cache = {}
-    else:
-        cache = {}
-
     # Load the scraped content from the cache if it exists there
-    if url in cache.keys() and not refresh_cache:
-        content = cache[url]
+    if url in cache.cache.keys() and not refresh_cache:
+        content = cache.get_item(url)
 
         # If the cache contains no content for the URL, then scrape anyway
         if content is None:
             content = try_scraping(url, timeout=5)
             if content is not None:
-                cache[url] = content
+                cache.insert_item(url, content)
 
     # If the URL doesn't exist in the cache, scrape the webpage
     else:
         content = try_scraping(url, timeout=5)
         if content is not None:
-            cache[url] = content
+            cache.insert_item(url, content)
 
-    # Save the cache
-    with open(cache_file, 'wb') as f:
-        pickle.dump(cache, f)
+    cache.save()
 
     # Create the soup object
     if content is not None:
@@ -149,13 +135,13 @@ def get_page_name(link):
     return page_name
 
 
-def get_relevant_content(relevant_links, cache_file):
+def get_relevant_content(relevant_links, cache):
     """
     Scrape lots of webpages for their "relevant content" given a list of
     links. Only scrape if the pages' contents are not already in the cache.
 
     :param dict relevant_links: page names with their corresponding links
-    :param str cache_file: path to the cache file
+    :param cacher.Cacher cache: Cacher object
 
     :return dict: page names with their corresponding relevant content
     """
@@ -163,7 +149,7 @@ def get_relevant_content(relevant_links, cache_file):
     relevant_content = {}
     if relevant_links is not None:
         for page_name, link in relevant_links.items():
-            soup = get_soup(link, cache_file)
+            soup = get_soup(link, cache)
             if soup is not None:
                 content = soup.body.find_all('div')[21].text
                 relevant_content[page_name] = content
