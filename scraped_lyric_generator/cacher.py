@@ -1,0 +1,26 @@
+import os
+import pickle
+
+
+class Cacher:
+    def __init__(self, path, cache=None, refresh_cache=False):
+        self.path = path
+        self.cache = cache
+        self.refresh_cache = refresh_cache
+
+    def initialise_cache(self):
+        if os.path.exists(self.path):
+            with open(self.path, 'rb') as f:
+                try:
+                    self.cache = pickle.load(f)
+                except EOFError:
+                    self.cache = {}
+        else:
+            self.cache = {}
+
+    def insert_item(self, identifier, item):
+        self.cache[identifier] = item
+
+    def save_cache(self):
+        with open(self.path, 'wb') as f:
+            pickle.dump(self.cache, f)
