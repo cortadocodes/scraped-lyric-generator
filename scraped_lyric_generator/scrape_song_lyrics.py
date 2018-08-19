@@ -1,6 +1,6 @@
 import os
 
-from scraped_lyric_generator.get_relevant_pages import get_relevant_pages, get_relevant_content
+from scraped_lyric_generator.scraper import get_relevant_pages, get_relevant_content
 
 
 CACHE_FILE = os.path.join('..', 'data', 'cache' + '.pkl')
