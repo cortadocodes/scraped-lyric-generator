@@ -97,6 +97,8 @@ def try_scraping(url, timeout):
     try:
         response = requests.get(url, timeout=timeout)
         content = response.text
+        code = response.status_code
+        print('Status code {}: request at {}'.format(code, url))
         return content
 
     except requests.exceptions.ConnectionError:
