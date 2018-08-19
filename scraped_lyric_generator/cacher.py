@@ -21,6 +21,9 @@ class Cacher:
     def insert_item(self, identifier, item):
         self.cache[identifier] = item
 
+    def get_item(self, identifier):
+        return self.cache[identifier]
+
     def save_cache(self):
         with open(self.path, 'wb') as f:
             pickle.dump(self.cache, f)
