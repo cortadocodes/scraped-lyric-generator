@@ -9,4 +9,4 @@ SEARCH_STRING = 'mychemicalromance'
 
 
 song_links = get_relevant_pages(URL, SEARCH_STRING, CACHE_FILE)
-songs = get_relevant_content(song_links)
+songs = get_relevant_content(song_links, CACHE_FILE)
