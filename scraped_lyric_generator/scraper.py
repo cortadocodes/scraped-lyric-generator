@@ -34,10 +34,15 @@ def get_soup(url, cache_file, add_to_cache=True):
 
     # Otherwise, get the soup from the server
     else:
-        response = requests.get(url, timeout=5)
-        content = response.text
+        try:
+            response = requests.get(url, timeout=5)
+            content = response.text
 
-        if add_to_cache:
+        except requests.exceptions.ConnectionError:
+            content = None
+            print('Connection error for url {} (server may have blocked scraper)'.format(url))
+
+        if (add_to_cache and cache.get(url) is not None):
             cache[url] = content
 
     # Save the cache
@@ -45,25 +50,27 @@ def get_soup(url, cache_file, add_to_cache=True):
         pickle.dump(cache, f)
 
     # Create the soup object
-    soup = BeautifulSoup(content, 'html.parser')
-    return soup
+    if content is not None:
+        soup = BeautifulSoup(content, 'html.parser')
+        return soup
 
 
 def get_relevant_links(soup, search_string, base_url):
-    # Get all links
-    link_objects = soup.find_all('a')
-    relevant_links = {}
+    if soup is not None:
+        # Get all links
+        link_objects = soup.find_all('a')
+        relevant_links = {}
 
-    # Store links containing the search_string
-    for link_object in link_objects:
-        link = link_object.get('href')
-        if link is not None:
-            if search_string in link:
-                page_name = get_page_name(link)
-                full_link = urljoin(base_url, link)
-                relevant_links[page_name] = full_link
+        # Store links containing the search_string
+        for link_object in link_objects:
+            link = link_object.get('href')
+            if link is not None:
+                if search_string in link:
+                    page_name = get_page_name(link)
+                    full_link = urljoin(base_url, link)
+                    relevant_links[page_name] = full_link
 
-    return relevant_links
+        return relevant_links
 
 
 def get_page_name(link):
@@ -73,9 +80,11 @@ def get_page_name(link):
 
 def get_relevant_content(relevant_links, cache_file):
     relevant_content = {}
-    for page_name, link in relevant_links.items():
-        soup = get_soup(link, cache_file)
-        content = soup.body.find_all('div')[21].text
-        relevant_content[page_name] = content
+    if relevant_links is not None:
+        for page_name, link in relevant_links.items():
+            soup = get_soup(link, cache_file)
+            if soup is not None:
+                content = soup.body.find_all('div')[21].text
+                relevant_content[page_name] = content
 
-    return relevant_content
+        return relevant_content
