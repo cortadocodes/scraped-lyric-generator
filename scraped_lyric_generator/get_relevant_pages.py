@@ -69,3 +69,13 @@ def get_relevant_links(soup, search_string, base_url):
 def get_page_name(link):
     page_name = link.split('/')[-1].split('.')[0]
     return page_name
+
+
+def get_relevant_content(relevant_links, cache_file):
+    relevant_content = {}
+    for page_name, link in relevant_links.items():
+        soup = get_soup(link, cache_file)
+        content = soup.body.find_all('div')[21].text
+        relevant_content[page_name] = content
+
+    return relevant_content
