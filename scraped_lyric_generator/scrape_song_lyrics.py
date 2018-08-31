@@ -1,6 +1,6 @@
 import os
 
-from scraped_lyric_generator.cacher import Cacher
+from scraped_lyric_generator.cache import Cache
 from scraped_lyric_generator.scraper import get_relevant_pages, get_relevant_content
 
 
@@ -10,7 +10,7 @@ SEARCH_STRING = 'mychemicalromance'
 
 
 # Initialise cache
-cache = Cacher(CACHE_FILE)
+cache = Cache(CACHE_FILE)
 
 song_links = get_relevant_pages(URL, SEARCH_STRING, cache)
 songs = get_relevant_content(song_links, cache)

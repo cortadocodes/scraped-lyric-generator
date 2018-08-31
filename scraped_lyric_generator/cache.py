@@ -2,7 +2,7 @@ import os
 import pickle
 
 
-class Cacher:
+class Cache:
     def __init__(self, path, cache=None, refresh_cache=False):
         self.path = path
         self.cache = cache

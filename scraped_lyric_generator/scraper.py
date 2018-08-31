@@ -13,7 +13,7 @@ def get_relevant_pages(url, search_string, cache):
 
     :param str url: URL of the main page
     :param str search_string: string to look for in each link
-    :param cacher.Cacher cache: Cacher object
+    :param cacher.Cache cache: Cache object
 
     :return dict: the page names and their links
     """
@@ -47,7 +47,7 @@ def get_soup(url, cache, refresh_cache=False):
     of the cache instead.
 
     :param str url: the webpage to be scraped
-    :param cacher.Cacher cache: Cacher object
+    :param cacher.Cache cache: Cache object
     :param bool refresh_cache: if true, scrape url again, even if its
         contents are in the cache
 
@@ -141,7 +141,7 @@ def get_relevant_content(relevant_links, cache):
     links. Only scrape if the pages' contents are not already in the cache.
 
     :param dict relevant_links: page names with their corresponding links
-    :param cacher.Cacher cache: Cacher object
+    :param cacher.Cache cache: Cache object
 
     :return dict: page names with their corresponding relevant content
     """
